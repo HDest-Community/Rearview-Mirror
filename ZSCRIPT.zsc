@@ -1,0 +1,180 @@
+version "4.0"
+
+class HDRearviewMirror : HDWeapon
+{
+	enum RearviewMirrorProperties
+	{
+		RVMProp_Flags,
+		RVMProp_Angle
+	}
+
+	override Inventory CreateTossable(int amt)
+	{
+		if (Camera)
+		{
+			Camera.Destroy();
+		}
+
+		return Super.CreateTossable(amt);
+	}
+	override bool AddSpareWeapon(actor newowner) { return AddSpareWeaponRegular(newowner); }
+	override HDWeapon GetSpareWeapon(actor newowner, bool reverse, bool doselect) { return GetSpareWeaponRegular(newowner, reverse, doselect); }
+	override double GunMass() { return 1; }
+	override double WeaponBulk() { return 10; }
+	override string, double GetPickupSprite() { return "RVMGA0", 0.52; }
+	override string GetHelpText()
+	{
+		return WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Adjust view angle\n"..
+		WEPHELP_ALTRELOAD.."  Switch hands";
+	}
+
+	override void DrawSightPicture(HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl, bool sightbob, vector2 bob, double fov, bool scopeview, actor hpc, string whichdot)
+	{
+		if (Camera)
+		{
+			TexMan.SetCameraToTexture(Camera, "HDMRRCAM", 90);
+			sb.DrawImage("HDMRRCAM", (0, -1) + bob, sb.DI_SCREEN_CENTER | sb.DI_ITEM_CENTER, scale: (0.2, 0.2));
+			sb.DrawImage("RVMRROR", bob, sb.DI_SCREEN_CENTER | sb.DI_ITEM_CENTER, scale: (2.0, 2.0));
+		}
+	}
+
+	private HDRearviewCamera Camera;
+	private bool WrongHand;
+
+	Default
+	{
+		+INVENTORY.INVBAR
+		+WEAPON.WIMPY_WEAPON
+		+HDWEAPON.FITSINBACKPACK
+		Weapon.SelectionOrder 300;
+		Weapon.SlotNumber 9;
+		Weapon.SlotPriority -0.1;
+		HDWeapon.BarrelSize 50, 1, 1;
+		Inventory.PickupMessage "You picked up a rearview mirror. Lookin' good.";
+		Inventory.PickupSound "weapons/pocket";
+		Scale 0.28;
+		Tag "Rearview mirror";
+		HDWeapon.Refid "rvm";
+	}
+
+	States
+	{
+		Spawn:
+			RVMG Z -1;
+			Stop;
+		Ready:
+			RVMG # 1
+			{
+				if (!invoker.Camera)
+				{
+					invoker.Camera = HDRearviewCamera(Spawn("HDRearviewCamera", pos));
+					invoker.Camera.master = self;
+					invoker.Camera.Tick();
+					invoker.Camera.WrongHand = invoker.WrongHand;
+				}
+				else
+				{
+					invoker.Camera.AdjustedAngle = invoker.WeaponStatus[RVMProp_Angle];
+				}
+
+				if (PressingFiremode())
+				{
+					int inputamt = player.cmd.yaw;
+					if (inputamt)
+					{
+						if (abs(inputamt) < (1 << 7))
+						{
+							inputamt = clamp(inputamt, -1, 1);
+						}
+						else
+						{
+							inputamt >>= 7;
+						}
+					}
+					HijackMouse();
+					invoker.WeaponStatus[RVMProp_Angle] = clamp(invoker.WeaponStatus[RVMProp_Angle] - InputAmt, -15, 15);
+				}
+
+				A_WeaponReady(WRF_ALLOWUSER3 | WRF_ALLOWUSER1 | WRF_NOFIRE);
+			}
+			Goto ReadyEnd;
+		Select0:
+			RVMG # 0 { player.GetPSprite(PSP_WEAPON).frame = invoker.WrongHand ? 1 : 0; }
+			Goto Select0Small;
+		Deselect0:
+			RVMG # 0
+			{
+				if (invoker.Camera)
+				{
+					invoker.Camera.Destroy();
+				}
+				player.GetPSprite(PSP_WEAPON).frame = invoker.WrongHand ? 1 : 0;
+			}
+			Goto Deselect0Small;
+		User3:
+			RVMG # 0 A_SelectWeapon("PickupManager");
+			Goto Ready;
+		AltReload:
+			RVMG # 0
+			{
+				if (invoker.Camera)
+				{
+					invoker.Camera.Destroy();
+				}
+			}
+			RVMG # 1 Offset(0, 36);
+			RVMG # 1 Offset(0, 42);
+			RVMG # 1 Offset(0, 50);
+			RVMG # 1 Offset(0, 60);
+			RVMG # 1 Offset(0, 74);
+			RVMG # 1 Offset(0, 90);
+			RVMG # 1 Offset(0, 120);
+			RVMG # 0
+			{
+				invoker.WrongHand = !invoker.WrongHand;
+				player.GetPSprite(PSP_WEAPON).frame = invoker.WrongHand ? 1 : 0;
+			}
+			RVMG # 1 Offset(0, 90);
+			RVMG # 1 Offset(0, 74);
+			RVMG # 1 Offset(0, 60);
+			RVMG # 1 Offset(0, 50);
+			RVMG # 1 Offset(0, 42);
+			RVMG # 1 Offset(0, 36);
+			RVMG # 1 Offset(0, 32);
+			Goto Nope;
+	}
+}
+
+class HDRearviewCamera : Actor
+{
+	override void Tick()
+	{
+		if (!master || master.Health <= 0)
+		{
+			Destroy();
+			return;
+		}
+
+		Warp(master, master.radius / 2 + 32 * cos(pitch), WrongHand ? -12 : 12, master.height + 32 * sin(-master.pitch), flags: WARPF_NOCHECKPOSITION | WARPF_INTERPOLATE);
+		A_FaceMaster(0);
+		angle += AdjustedAngle;
+		pitch = -master.pitch;
+
+		Super.Tick();
+	}
+
+	bool WrongHand;
+	int AdjustedAngle;
+
+	Default
+	{
+		+NOINTERACTION
+	}
+
+	// States
+	// {
+	// 	Spawn:
+	// 		BAL2 A -1;
+	// 		Stop;
+	// }
+}
