@@ -92,7 +92,7 @@ class HDRearviewMirror : HDWeapon
 						}
 					}
 					HijackMouse();
-					invoker.WeaponStatus[RVMProp_Angle] = clamp(invoker.WeaponStatus[RVMProp_Angle] - InputAmt, -15, 15);
+					invoker.WeaponStatus[RVMProp_Angle] = clamp(invoker.WeaponStatus[RVMProp_Angle] + InputAmt, -15, 15);
 				}
 
 				A_WeaponReady(WRF_ALLOWUSER3 | WRF_ALLOWUSER1 | WRF_NOFIRE);
