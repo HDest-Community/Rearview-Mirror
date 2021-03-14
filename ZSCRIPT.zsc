@@ -21,7 +21,7 @@ class HDRearviewMirror : HDWeapon
 	override HDWeapon GetSpareWeapon(actor newowner, bool reverse, bool doselect) { return GetSpareWeaponRegular(newowner, reverse, doselect); }
 	override double GunMass() { return 1; }
 	override double WeaponBulk() { return 10; }
-	override string, double GetPickupSprite() { return "RVMGA0", 0.52; }
+	override string, double GetPickupSprite() { return "RVMGZ0", 0.52; }
 	override string GetHelpText()
 	{
 		return WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Adjust view angle\n"..
@@ -50,6 +50,7 @@ class HDRearviewMirror : HDWeapon
 		HDWeapon.BarrelSize 50, 1, 1;
 		Inventory.PickupMessage "You picked up a rearview mirror. Lookin' good.";
 		Inventory.PickupSound "weapons/pocket";
+		Inventory.Icon "RVMGZ0";
 		Scale 0.28;
 		Tag "Rearview mirror";
 		HDWeapon.Refid "rvm";
