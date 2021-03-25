@@ -132,7 +132,7 @@ class HDRearviewCamera : Actor
 
 		Warp(master, master.radius / 2 + 32 * cos(pitch), WrongHand ? -12 : 12, master.height + 32 * sin(-master.pitch), flags: WARPF_NOCHECKPOSITION | WARPF_INTERPOLATE);
 		A_FaceMaster(0);
-		angle -= 15;
+		angle += (Wronghand ? -15 : 15);
 		pitch = -master.pitch;
 
 		Super.Tick();
