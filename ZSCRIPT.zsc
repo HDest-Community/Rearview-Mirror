@@ -4,8 +4,7 @@ class HDRearviewMirror : HDWeapon
 {
 	enum RearviewMirrorProperties
 	{
-		RVMProp_Flags,
-		RVMProp_Angle
+		RVMProp_Flags
 	}
 
 	override Inventory CreateTossable(int amt)
@@ -24,8 +23,7 @@ class HDRearviewMirror : HDWeapon
 	override string, double GetPickupSprite() { return "RVMGZ0", 0.52; }
 	override string GetHelpText()
 	{
-		return WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Adjust view angle\n"..
-		WEPHELP_ALTRELOAD.."  Switch hands";
+		return WEPHELP_ALTRELOAD.."  Switch hands";
 	}
 
 	override void DrawSightPicture(HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl, bool sightbob, vector2 bob, double fov, bool scopeview, actor hpc, string whichdot)
@@ -70,28 +68,6 @@ class HDRearviewMirror : HDWeapon
 					invoker.Camera.master = self;
 					invoker.Camera.Tick();
 					invoker.Camera.WrongHand = invoker.WrongHand;
-				}
-				else
-				{
-					invoker.Camera.AdjustedAngle = invoker.WeaponStatus[RVMProp_Angle];
-				}
-
-				if (PressingFiremode())
-				{
-					int inputamt = player.cmd.yaw;
-					if (inputamt)
-					{
-						if (abs(inputamt) < (1 << 7))
-						{
-							inputamt = clamp(inputamt, -1, 1);
-						}
-						else
-						{
-							inputamt >>= 7;
-						}
-					}
-					HijackMouse();
-					invoker.WeaponStatus[RVMProp_Angle] = clamp(invoker.WeaponStatus[RVMProp_Angle] + InputAmt, -15, 15);
 				}
 
 				A_WeaponReady(WRF_ALLOWUSER3 | WRF_ALLOWUSER1 | WRF_NOFIRE);
@@ -156,14 +132,13 @@ class HDRearviewCamera : Actor
 
 		Warp(master, master.radius / 2 + 32 * cos(pitch), WrongHand ? -12 : 12, master.height + 32 * sin(-master.pitch), flags: WARPF_NOCHECKPOSITION | WARPF_INTERPOLATE);
 		A_FaceMaster(0);
-		angle += AdjustedAngle;
+		angle -= 15;
 		pitch = -master.pitch;
 
 		Super.Tick();
 	}
 
 	bool WrongHand;
-	int AdjustedAngle;
 
 	Default
 	{
