@@ -45,7 +45,7 @@ class HDRearviewMirror : HDWeapon
 		+WEAPON.WIMPY_WEAPON
 		+HDWEAPON.FITSINBACKPACK
 		Weapon.SelectionOrder 300;
-		HDWeapon.BarrelSize 50, 1, 1;
+		HDWeapon.BarrelSize 40, 1, 1;
 		Inventory.PickupMessage "You picked up a rearview mirror. Lookin' good.";
 		Inventory.PickupSound "weapons/pocket";
 		Inventory.Icon "RVMGZ0";
@@ -130,9 +130,8 @@ class HDRearviewCamera : Actor
 			return;
 		}
 
-		Warp(master, master.radius / 2 + 32 * cos(pitch), WrongHand ? -12 : 12, master.height + 32 * sin(-master.pitch), flags: WARPF_NOCHECKPOSITION | WARPF_INTERPOLATE);
-		A_FaceMaster(0);
-		angle += (Wronghand ? -15 : 15);
+		Warp(master, (master.radius + 24) * cos(pitch), WrongHand ? -6 : 6, master.height * 0.80 + 32 * sin(-master.pitch), flags: WARPF_NOCHECKPOSITION | WARPF_INTERPOLATE);
+		angle = (master.angle - 180) + (Wronghand ? -15 : 15);
 		pitch = -master.pitch;
 
 		Super.Tick();
@@ -142,7 +141,7 @@ class HDRearviewCamera : Actor
 
 	Default
 	{
-		+SEEINVISIBLE
+		+SEEINVISIBLE // [Ace] So it doesn't spaz out if the player is invisible, although the mirror won't even show up to begin with.
 		+NOINTERACTION
 	}
 
