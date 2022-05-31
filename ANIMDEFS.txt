@@ -1,1 +1,2 @@
-cameratexture HDMRRCAM 1100 540
+cameratexture HDMRRCM0 550 270
+cameratexture HDMRRCM1 550 270

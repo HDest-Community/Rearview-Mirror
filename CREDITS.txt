@@ -1,5 +1,2 @@
-Code:
-- Accensus
-
 Sprites:
 - Mor'ladim
