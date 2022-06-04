@@ -111,6 +111,7 @@ class HDRearviewMirror : HDPickup
 	{
 		+INVENTORY.INVBAR
 		+HDPICKUP.FITSINBACKPACK
+		-HDWEAPON.DROPTRANSLATION
 		HDPickup.Bulk 10;
 		Inventory.PickupMessage "You picked up a rearview mirror. Lookin' good.";
 		Inventory.PickupSound "weapons/pocket";
