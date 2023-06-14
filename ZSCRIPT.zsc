@@ -86,8 +86,8 @@ class HDRearviewMirror : HDPickup
 				int flags = flip ? sb.DI_ITEM_RIGHT_TOP : sb.DI_ITEM_LEFT_TOP;
 				double shift = flip ? -9 : 9;
 				vector2 baseOffset = ((Cameras[i].LeftShoulder ? -30 : 30), 8) / scaleFac;
-				sb.DrawImage("HDMRRCM"..i, (baseOffset.x + shift / scaleFac, baseOffset.y + 9 / scaleFac) + hpl.hudbob, sb.DI_SCREEN_CENTER_TOP | flags, scale: (0.3, 0.3) / scaleFac);
-				sb.DrawImage("RVMRROR", baseOffset + hpl.hudbob, sb.DI_SCREEN_CENTER_TOP | flags, scale: (1.5, 1.5) / scaleFac);
+				sb.DrawImage("HDMRRCM"..i, (baseOffset.x + shift / scaleFac, baseOffset.y + 9 / scaleFac) + hpl.wepbob, sb.DI_SCREEN_CENTER_TOP | flags, scale: (0.3, 0.3) / scaleFac);
+				sb.DrawImage("RVMRROR", baseOffset + hpl.wepbob, sb.DI_SCREEN_CENTER_TOP | flags, scale: (1.5, 1.5) / scaleFac);
 			}
 		}
 	}
